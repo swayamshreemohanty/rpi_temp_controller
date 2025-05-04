@@ -33,5 +33,5 @@ def control_fan(target_temp):
         GPIO.cleanup()
 
 if __name__ == "__main__":
-    target_temperature = 35.0  # Hardcoded target temperature in °C
+    target_temperature = 40.0  # Hardcoded target temperature in °C
     control_fan(target_temperature)
