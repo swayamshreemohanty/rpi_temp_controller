@@ -12,17 +12,17 @@ def get_cpu_temperature():
         temp_str = file.read().strip()
     return int(temp_str) / 1000.0  # Convert millidegree Celsius to degree Celsius
 
-def control_fan(target_temp):
-    """Controls the fan based on the target temperature."""
+def control_fan(cold_temp, hot_temp):
+    """Controls the fan based on the cold and hot target temperatures."""
     try:
         while True:
             current_temp = get_cpu_temperature()
             print(f"Current Temperature: {current_temp}°C")
 
-            if current_temp > target_temp:
+            if current_temp > hot_temp:
                 GPIO.output(FAN_PIN, GPIO.HIGH)  # Turn fan on
                 print("Fan ON")
-            else:
+            elif current_temp < cold_temp:
                 GPIO.output(FAN_PIN, GPIO.LOW)  # Turn fan off
                 print("Fan OFF")
 
@@ -33,5 +33,6 @@ def control_fan(target_temp):
         GPIO.cleanup()
 
 if __name__ == "__main__":
-    target_temperature = 40.0  # Hardcoded target temperature in °C
-    control_fan(target_temperature)
+    cold_target_temperature = 35.0  # Temperature to stop the fan
+    hot_target_temperature = 45.0  # Temperature to start the fan
+    control_fan(cold_target_temperature, hot_target_temperature)
