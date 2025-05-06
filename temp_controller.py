@@ -3,20 +3,36 @@ import time
 
 # GPIO setup
 FAN_PIN = 17
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(FAN_PIN, GPIO.OUT)
+try:
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(FAN_PIN, GPIO.OUT)
+except Exception as e:
+    print(f"Error during GPIO setup: {e}")
+    GPIO.cleanup()
+    raise
 
 def get_cpu_temperature():
     """Reads the CPU temperature from the system file."""
-    with open("/sys/class/thermal/thermal_zone0/temp", "r") as file:
-        temp_str = file.read().strip()
-    return int(temp_str) / 1000.0  # Convert millidegree Celsius to degree Celsius
+    try:
+        import subprocess
+        temp_str = subprocess.check_output(['sudo', 'cat', '/sys/class/thermal/thermal_zone0/temp']).decode().strip()
+        return int(temp_str) / 1000.0  # Convert millidegree Celsius to degree Celsius
+    except FileNotFoundError:
+        print("Temperature file not found. Ensure the system supports temperature monitoring.")
+        return None
+    except Exception as e:
+        print(f"Error reading CPU temperature: {e}")
+        return None
 
 def control_fan(cold_temp, hot_temp):
     """Controls the fan based on the cold and hot target temperatures."""
     try:
         while True:
             current_temp = get_cpu_temperature()
+            if current_temp is None:
+                time.sleep(5)
+                continue
+
             print(f"Current Temperature: {current_temp}°C")
 
             if current_temp > hot_temp:

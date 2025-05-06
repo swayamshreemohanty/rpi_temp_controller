@@ -1,11 +1,15 @@
 [Unit]
-Description=Fan Controller Service
+Description=RPI Temp Controller Service
 After=multi-user.target
 
 [Service]
 Type=simple
 ExecStart=/usr/bin/python3 /home/swayamshreemohanty/projects/rpi_temp_controller/temp_controller.py
 Restart=on-failure
+WorkingDirectory=/home/swayamshreemohanty/projects/rpi_temp_controller
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
